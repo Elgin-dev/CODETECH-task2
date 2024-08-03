@@ -1,0 +1,49 @@
+#include <DHT.h>
+
+#define DHTPIN 2
+#define DHTTYPE DHT11
+#define LDR_PIN A1
+#define RELAY_PIN 7
+#define LED_PIN 13
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+  
+  pinMode(RELAY_PIN, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
+}
+
+void loop() {
+  // Read sensor values
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+  int lightLevel = analogRead(LDR_PIN);
+
+  // Print sensor values to the serial monitor
+  Serial.print("Temperature: "); Serial.print(temperature); Serial.println(" *C");
+  Serial.print("Humidity: "); Serial.print(humidity); Serial.println(" %");
+  Serial.print("Light Level: "); Serial.println(lightLevel);
+
+  // Simulate demand-response mechanism based on temperature
+  if (temperature > 30) {
+    digitalWrite(RELAY_PIN, HIGH); // Turn on the relay
+    digitalWrite(LED_PIN, HIGH);   // Turn on the LED
+    Serial.println("Relay ON due to high temperature");
+  } else {
+    digitalWrite(RELAY_PIN, LOW);  // Turn off the relay
+    digitalWrite(LED_PIN, LOW);    // Turn off the LED
+    Serial.println("Relay OFF due to low temperature");
+  }
+
+  // Simulate grid balancing based on light level
+  if (lightLevel > 500) {
+    Serial.println("High light level, simulating high renewable energy input");
+  } else {
+    Serial.println("Low light level, simulating low renewable energy input");
+  }
+
+  delay(2000); // Delay for 2 seconds
+}
